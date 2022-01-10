@@ -1,13 +1,27 @@
 async function fetchWeather(city) {
-	const test = await fetch(`https://api.weatherbit.io/v2.0/forecast/daily?key=24241ff129a14a6e89b228fa89e946f5&lang=sv&days=6&city=${city}`)
-	const result = await test.json();
-	return result
+	const future = await fetch(`https://api.weatherbit.io/v2.0/forecast/daily?key=24241ff129a14a6e89b228fa89e946f5&lang=sv&days=6&city=${city}`)
+	.then(function(response) {
+		if(response.status == 200){
+			$(".error").hide();
+			return response.json();
+		}
+		else{	
+			$(".error").show();
+		}
+	  }).then(function(data) {
+		return data;
+	  });
+	  return future;
+
 }
 async function fetchWeatherCurrent(city) {
-	const test = await fetch(`http://api.weatherbit.io/v2.0/current?key=24241ff129a14a6e89b228fa89e946f5&lang=sv&city=${city}`)
-	const result = await test.json();
+	const current = await fetch(`http://api.weatherbit.io/v2.0/current?key=24241ff129a14a6e89b228fa89e946f5&lang=sv&city=${city}`)
+	
+	const result = await current.json();
 	return result
 }
+
+
 
 function search() {
 	fetchWeather(document.querySelector(".search-bar").value).then(data => {
@@ -24,21 +38,26 @@ function searchCurrent() {
 }
 let weather = {
 	displayWeather: function(data) {
-		let result = data.data[0]
-		document.querySelector(".city").innerText = "Väder i " + data.city_name;
-		document.querySelector(".icon").src = `https://www.weatherbit.io/static/img/icons/${result.weather.icon}.png`
-		document.querySelector(".description").innerText = result.weather.description;
-		document.querySelector(".temp").innerText = result.temp + "°C";
-		document.querySelector(".timezone").innerText = `Vindriktning: ${result.wind_cdir_full}`;
-		document.querySelector(".wind").innerText = `Vind: ${result.wind_spd} km/h`;
-		document.querySelector(".air").innerText = `Luftfuktighet ${result.rh} %`;
-		document.querySelector(".sunrise").innerText = `${result.valid_date}`;
-		document.querySelector(".sunset").innerText = `Snörisk   ${result.snow} %`;
-		$(".weather").removeClass("loading")
-		$("body").css("background-image", "url(" + `https://source.unsplash.com/1600x900/?${data.city_name}` + ")")
+		if(data != undefined){
+			let result = data.data[0]
+			document.querySelector(".city").innerText = "Väder i " + data.city_name;
+			document.querySelector(".icon").src = `https://www.weatherbit.io/static/img/icons/${result.weather.icon}.png`
+			document.querySelector(".description").innerText = result.weather.description;
+			document.querySelector(".temp").innerText = result.temp + "°C";
+			document.querySelector(".timezone").innerText = `Vindriktning: ${result.wind_cdir_full}`;
+			document.querySelector(".wind").innerText = `Vind: ${result.wind_spd} km/h`;
+			document.querySelector(".air").innerText = `Luftfuktighet ${result.rh} %`;
+			document.querySelector(".sunrise").innerText = `${result.valid_date}`;
+			document.querySelector(".sunset").innerText = `Snörisk   ${result.snow} %`;
+			$(".weather").removeClass("loading")
+			$("body").css("background-image", "url(" + `https://source.unsplash.com/1600x900/?${data.city_name}` + ")")
+
+		}
+	
 	},
 	daily: function(data) {
-		{
+		if (data!= undefined) 
+			{
 			document.querySelector(".dateone").innerText = data.data[1].datetime;
 			document.querySelector(".day1temp").innerText = data.data[1].weather.description;
             document.querySelector(".tempone").innerText = data.data[1].temp + "°C";
